@@ -86,6 +86,9 @@ contract ZigZagToken is Context {
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
+        
+        // This is the only deviation from the OpenZeppelin v4.6.0 standard
+        // The tokens are minted to the deployer directly on contract creation
         _mint(_msgSender(), 1e26); // 100M total supply
     }
 
