@@ -59,8 +59,6 @@ contract ZigZagToken is Context {
     string private _name;
     string private _symbol;
 
-    uint256 private immutable _cap;
-
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
      * another (`to`).
@@ -85,11 +83,10 @@ contract ZigZagToken is Context {
      * All two of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor(string memory name_, string memory symbol_, uint256 cap_) {
+    constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        require(cap_ > 0, "ERC20Capped: cap is 0");
-        _cap = cap_;
+        _mint(_msgSender(), 1e26); // 100M total supply
     }
 
     /**
@@ -281,12 +278,6 @@ contract ZigZagToken is Context {
         _afterTokenTransfer(from, to, amount);
     }
 
-    /**
-     * @dev Returns the cap on the token's total supply.
-     */
-    function cap() public view virtual returns (uint256) {
-        return _cap;
-    }
 
     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
      * the total supply.
@@ -298,7 +289,6 @@ contract ZigZagToken is Context {
      * - `account` cannot be the zero address.
      */
     function _mint(address account, uint256 amount) internal virtual {
-        require(_totalSupply + amount <= cap(), "ERC20Capped: cap exceeded");
         require(account != address(0), "ERC20: mint to the zero address");
 
         _beforeTokenTransfer(address(0), account, amount);
@@ -425,9 +415,4 @@ contract ZigZagToken is Context {
         uint256 amount
     ) internal virtual {}
 
-    // The token is capped and there is no auth check, so the full cap should be minted immediately
-    // This function will cease to work after the cap is hit
-    function mint(address to, uint256 amount) public virtual {
-        _mint(to, amount);
-    }
 }
